@@ -26,7 +26,7 @@ export const AIAnalysisCard: React.FC<AIAnalysisCardProps> = ({ analysis, select
               AI Deal Intelligence & Verdict
             </h2>
             <p className="text-xs text-slate-400">
-              Evaluated using {analysis.usedAiModel === 'gemini-2.5-flash' ? 'Google Gemini 2.5 Flash' : 'Hardware Benchmark AI Engine'}
+              Evaluated using {analysis.usedAiModel === 'gemini-3.8-flash' ? 'Google Gemini 3.8 Flash' : 'Hardware Benchmark AI Engine'}
             </p>
           </div>
         </div>

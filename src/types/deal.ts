@@ -78,5 +78,5 @@ export interface AIAnalysisSummary {
   editorialVerdict: string;
   specComparisonHighlights: string[];
   hiddenSavingsNotes: string[];
-  usedAiModel: 'gemini-2.5-flash' | 'heuristic-engine';
+  usedAiModel: 'gemini-3.8-flash' | 'heuristic-engine';
 }
