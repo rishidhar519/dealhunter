@@ -1,0 +1,16 @@
+User-agent: *
+Allow: /
+Allow: /privacy
+Allow: /terms
+Allow: /disclosure
+
+# Disallow scrapers and bots from hitting API endpoints
+Disallow: /api/
+Disallow: /api/hunt
+Disallow: /api/parse-requirements
+Disallow: /api/parse-url
+
+# Rate-limiting guidance for legitimate crawlers
+Crawl-delay: 5
+
+Sitemap: https://dealhnter.vercel.app/sitemap.xml

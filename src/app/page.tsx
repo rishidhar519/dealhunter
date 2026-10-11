@@ -1,14 +1,23 @@
 'use client';
 
 import React, { useState, useEffect } from 'react';
+import Link from 'next/link';
 import { Header } from '@/components/Header';
 import { WalletSelector } from '@/components/WalletSelector';
 import { RequirementNegotiator } from '@/components/RequirementNegotiator';
 import { AIAnalysisCard } from '@/components/AIAnalysisCard';
 import { DealCard } from '@/components/DealCard';
-import { CalculatedDeal, AIAnalysisSummary } from '@/types/deal';
+import { CalculatedDeal, AIAnalysisSummary, ProductCategory } from '@/types/deal';
 import { ParsedRequirementJSON } from '@/types/requirements';
-import { Sparkles, ShoppingBag, ShieldCheck, RefreshCw, CheckCircle2, Layers, Store } from 'lucide-react';
+import { ShieldCheck, RefreshCw, CheckCircle2, Layers, Store, Laptop, Smartphone, Headphones, Tv, Globe } from 'lucide-react';
+
+const CATEGORIES: { id: ProductCategory; label: string; icon: React.ComponentType<{ className?: string }> }[] = [
+  { id: 'laptops', label: 'Laptops', icon: Laptop },
+  { id: 'smartphones', label: 'Smartphones', icon: Smartphone },
+  { id: 'audio', label: 'Audio & Wearables', icon: Headphones },
+  { id: 'smart-tvs', label: 'Smart TVs', icon: Tv },
+  { id: 'all', label: 'All Deals', icon: Globe },
+];
 
 export default function Home() {
   const [apiKey, setApiKey] = useState<string>('');
@@ -17,6 +26,7 @@ export default function Home() {
     'SBI_DC',
     'AMAZON_PAY_ICICI',
   ]);
+  const [selectedCategory, setSelectedCategory] = useState<ProductCategory>('laptops');
   const [activeRequirement, setActiveRequirement] = useState<ParsedRequirementJSON | null>(null);
   const [exactDeals, setExactDeals] = useState<CalculatedDeal[]>([]);
   const [alternativeDeals, setAlternativeDeals] = useState<CalculatedDeal[]>([]);
@@ -29,25 +39,28 @@ export default function Home() {
     if (savedKey) {
       setApiKey(savedKey);
     }
-    // Perform initial hunt with default wallet and spec
-    fetchDeals(['SBI_CC', 'SBI_DC', 'AMAZON_PAY_ICICI']);
+    // Perform initial hunt with default wallet and category
+    fetchDeals(['SBI_CC', 'SBI_DC', 'AMAZON_PAY_ICICI'], null, 'laptops');
   }, []);
 
   const fetchDeals = async (
     cardsToUse: string[],
-    reqOverride?: ParsedRequirementJSON
+    reqOverride?: ParsedRequirementJSON | null,
+    categoryToUse?: ProductCategory
   ) => {
     setIsLoading(true);
     try {
       const activeKey = apiKey || '';
-      const req = reqOverride || activeRequirement;
+      const req = reqOverride !== undefined ? reqOverride : activeRequirement;
+      const cat = categoryToUse || selectedCategory;
 
       const body = {
+        category: cat,
         selectedCards: cardsToUse,
         brand: req?.brandPreference?.value || 'all',
-        minRamGb: req?.ramGb?.value || 16,
-        minStorageGb: req?.storageGb?.value || 512,
-        vramMinGb: req?.gpu?.value?.minVramGb || 6,
+        minRamGb: cat === 'laptops' ? (req?.ramGb?.value || 16) : undefined,
+        minStorageGb: cat === 'laptops' ? (req?.storageGb?.value || 512) : undefined,
+        vramMinGb: cat === 'laptops' ? (req?.gpu?.value?.minVramGb || 6) : undefined,
         budgetMax: req?.budgetMax?.value || 95000,
       };
 
@@ -75,12 +88,17 @@ export default function Home() {
 
   const handleWalletChange = (newCards: string[]) => {
     setSelectedCards(newCards);
-    fetchDeals(newCards);
+    fetchDeals(newCards, activeRequirement, selectedCategory);
+  };
+
+  const handleCategoryChange = (category: ProductCategory) => {
+    setSelectedCategory(category);
+    fetchDeals(selectedCards, activeRequirement, category);
   };
 
   const handleConfirmRequirements = (confirmedReq: ParsedRequirementJSON) => {
     setActiveRequirement(confirmedReq);
-    fetchDeals(selectedCards, confirmedReq);
+    fetchDeals(selectedCards, confirmedReq, selectedCategory);
   };
 
   return (
@@ -96,14 +114,37 @@ export default function Home() {
         <div className="text-center space-y-3 max-w-3xl mx-auto pt-2">
           <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-indigo-500/10 border border-indigo-500/20 text-xs font-semibold text-indigo-400">
             <Store className="w-3.5 h-3.5" />
-            Scanning 9 Major Indian Retailers • Multi-Card Wallet Engine
+            Scanning 13 Indian Retailers &amp; Official Stores • Multi-Card Wallet Engine
           </div>
+
           <h1 className="text-3xl sm:text-4xl lg:text-5xl font-black text-white tracking-tight leading-tight">
-            Smart Deal Hunter with <span className="text-transparent bg-clip-text bg-gradient-to-r from-amber-400 via-indigo-400 to-cyan-400">AI Intent Negotiation</span> & Multi-Card Wallet
+            Smart Deal Hunter with <span className="text-transparent bg-clip-text bg-gradient-to-r from-amber-400 via-indigo-400 to-cyan-400">AI Intent Negotiation</span> &amp; Multi-Card Wallet
           </h1>
           <p className="text-sm sm:text-base text-slate-400 leading-relaxed">
-            Tell DealHunter what you want in natural language. We analyze your requirements, prioritize critical dealbreakers, and search <strong>Amazon, Flipkart, Croma, Reliance Digital, Vijay Sales & Brand Stores</strong> applying your wallet cards automatically.
+            Describe what you need in plain English. We prioritize critical specs, scan <strong>Amazon, Flipkart, Croma, Reliance Digital, Vijay Sales, Dell, HP, Lenovo, Acer, ASUS, Samsung &amp; Apple</strong>, and automatically apply maximum discounts from your cards.
           </p>
+        </div>
+
+        {/* Category Switcher Tabs */}
+        <div className="flex items-center justify-center gap-2 flex-wrap">
+          {CATEGORIES.map((cat) => {
+            const Icon = cat.icon;
+            const isSelected = selectedCategory === cat.id;
+            return (
+              <button
+                key={cat.id}
+                onClick={() => handleCategoryChange(cat.id)}
+                className={`flex items-center gap-2 px-4 py-2.5 rounded-xl text-xs sm:text-sm font-bold transition-all border ${
+                  isSelected
+                    ? 'bg-indigo-600 border-indigo-500 text-white shadow-lg shadow-indigo-600/30'
+                    : 'bg-slate-900/80 border-slate-800 text-slate-400 hover:text-white hover:border-slate-700'
+                }`}
+              >
+                <Icon className={`w-4 h-4 ${isSelected ? 'text-white' : 'text-slate-400'}`} />
+                {cat.label}
+              </button>
+            );
+          })}
         </div>
 
         {/* 1. Multi-Card Wallet Selector */}
@@ -126,7 +167,7 @@ export default function Home() {
           />
         )}
 
-        {/* 4. Tab Navigation across 9 Stores */}
+        {/* 4. Tab Navigation across Stores */}
         <div className="space-y-6">
           <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 border-b border-slate-800 pb-3">
             <div className="flex items-center gap-3">
@@ -139,7 +180,7 @@ export default function Home() {
                 }`}
               >
                 <CheckCircle2 className="w-4 h-4 text-emerald-400" />
-                Target Product Across Stores ({exactDeals.length})
+                Featured Store Picks ({exactDeals.length})
               </button>
               <button
                 onClick={() => setActiveTab('alternatives')}
@@ -150,14 +191,14 @@ export default function Home() {
                 }`}
               >
                 <Layers className="w-4 h-4 text-amber-400" />
-                Hardware Upgrades & Value Alternatives ({alternativeDeals.length})
+                Alternative Stores &amp; Upgrades ({alternativeDeals.length})
               </button>
             </div>
 
             {isLoading && (
               <div className="flex items-center gap-1.5 text-xs text-indigo-400 font-medium">
                 <RefreshCw className="w-3.5 h-3.5 animate-spin" />
-                Optimizing discounts for your {selectedCards.length} wallet cards across 9 stores...
+                Optimizing discounts for your {selectedCards.length} wallet cards across 13 stores...
               </div>
             )}
           </div>
@@ -166,10 +207,10 @@ export default function Home() {
             <div className="space-y-4">
               <div className="bg-indigo-950/30 border border-indigo-500/20 rounded-xl p-4 text-xs text-indigo-300 flex items-center justify-between flex-wrap gap-2">
                 <div>
-                  <strong>Head-to-Head Comparison:</strong> Live pricing across Amazon, Flipkart, Croma, Reliance Digital, Vijay Sales & Lenovo Store.
+                  <strong>Store Comparison:</strong> Comparing live pricing across Amazon, Flipkart, Croma, Reliance Digital, Vijay Sales &amp; Official Brand Stores.
                 </div>
                 <div className="text-emerald-400 font-bold">
-                  ★ Amazon wins with SBI Card (Save ₹16,250 on-page offer $\rightarrow$ ₹83,740).
+                  ★ Active Card Wallet applied automatically across all store listings.
                 </div>
               </div>
               <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
@@ -181,7 +222,7 @@ export default function Home() {
           ) : (
             <div className="space-y-4">
               <div className="bg-slate-900 border border-slate-800 rounded-xl p-4 text-xs text-slate-400">
-                <strong>Alternative Hardware Tiers:</strong> Includes RTX 4050 upgrades (+35% gaming FPS & Frame Gen) and value options from Acer and ASUS stores.
+                <strong>Alternative Hardware Tiers:</strong> Spec upgrades, official direct-to-consumer store variants, and high-value alternatives.
               </div>
               <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
                 {alternativeDeals.map((deal, idx) => (
@@ -193,13 +234,44 @@ export default function Home() {
         </div>
       </main>
 
-      <footer className="border-t border-slate-900 bg-slate-950 py-8 mt-12 text-center text-xs text-slate-500">
-        <div className="max-w-7xl mx-auto px-4 flex flex-col sm:flex-row items-center justify-between gap-4">
-          <div className="flex items-center gap-2 text-slate-400 font-semibold">
-            <ShieldCheck className="w-4 h-4 text-emerald-400" />
-            DealHunter • Amazon, Flipkart, Croma, Reliance Digital, Vijay Sales & Brand Stores
+      {/* Footer with Legal Compliance & Affiliate Disclosure */}
+      <footer className="border-t border-slate-900 bg-slate-950 py-10 mt-16 text-xs text-slate-500">
+        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 space-y-6">
+          {/* Statutory Affiliate Disclaimer Banner */}
+          <div className="bg-slate-900/60 border border-slate-800/80 rounded-xl p-4 text-slate-400 text-center leading-relaxed max-w-4xl mx-auto space-y-1.5">
+            <p className="font-semibold text-slate-300">
+              Affiliate &amp; Price Transparency Statement
+            </p>
+            <p className="text-[11px]">
+              DealHunter participates in the Amazon Associates Program and various merchant affiliate programs. When you click outward links and make purchases, we may earn a referral fee at zero additional cost to you. Product prices, bank discounts, and coupon availability are subject to real-time changes by merchants.
+            </p>
           </div>
-          <p>Multi-Card Wallet & Dynamic Requirement Engine deployed on Vercel</p>
+
+          <div className="flex flex-col sm:flex-row items-center justify-between gap-4 pt-4 border-t border-slate-900/80">
+            <div className="flex items-center gap-2 text-slate-400 font-semibold">
+              <ShieldCheck className="w-4 h-4 text-emerald-400" />
+              DealHunter • 13 Stores Scanned Across India
+            </div>
+
+            {/* Legal Navigation Links */}
+            <div className="flex items-center gap-5 text-slate-400 font-medium">
+              <Link href="/privacy" className="hover:text-indigo-400 transition-colors">
+                Privacy Policy
+              </Link>
+              <span>•</span>
+              <Link href="/terms" className="hover:text-indigo-400 transition-colors">
+                Terms of Use
+              </Link>
+              <span>•</span>
+              <Link href="/disclosure" className="hover:text-indigo-400 transition-colors">
+                Affiliate Disclosure
+              </Link>
+            </div>
+          </div>
+
+          <div className="text-center text-[11px] text-slate-600">
+            © 2026 DealHunter. Built with Gemini 3.8 Flash &amp; Next.js 16. Deployed on Vercel.
+          </div>
         </div>
       </footer>
     </div>

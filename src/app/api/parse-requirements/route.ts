@@ -1,8 +1,23 @@
 import { NextResponse } from 'next/server';
 import { ParsedRequirementJSON } from '@/types/requirements';
+import { checkRateLimit } from '@/lib/rate-limiter';
 
 export async function POST(req: Request) {
   try {
+    const forwardedFor = req.headers.get('x-forwarded-for');
+    const clientIp = forwardedFor ? forwardedFor.split(',')[0].trim() : '127.0.0.1';
+    const rateCheck = checkRateLimit(clientIp, 25, 60000); // 25 AI queries/min per IP
+
+    if (!rateCheck.success) {
+      return NextResponse.json(
+        {
+          error: 'Rate limit exceeded for AI requirement parsing. Please wait a minute before trying again.',
+          retryAfterSeconds: rateCheck.resetInSeconds,
+        },
+        { status: 429 }
+      );
+    }
+
     const { prompt } = await req.json();
     if (!prompt || typeof prompt !== 'string' || prompt.trim().length === 0) {
       return NextResponse.json({ error: 'Prompt is required' }, { status: 400 });

@@ -1,8 +1,9 @@
 'use client';
 
 import React, { useState } from 'react';
-import { ExternalLink, Tag, ChevronDown, ChevronUp, Cpu, HardDrive, Monitor, ShieldAlert, Sparkles, Check } from 'lucide-react';
+import { ExternalLink, Tag, ChevronDown, ChevronUp, Cpu, HardDrive, Monitor, ShieldAlert, Sparkles, Check, Smartphone, Headphones, Tv } from 'lucide-react';
 import { CalculatedDeal, Platform } from '@/types/deal';
+import { buildLiveAffiliateLink } from '@/lib/affiliate-config';
 
 interface DealCardProps {
   deal: CalculatedDeal;
@@ -15,9 +16,13 @@ const PLATFORM_STYLES: Record<Platform, { name: string; bg: string; text: string
   croma: { name: 'Croma', bg: 'bg-teal-500/10', text: 'text-teal-400', border: 'border-teal-500/30' },
   reliancedigital: { name: 'Reliance Digital', bg: 'bg-red-500/10', text: 'text-red-400', border: 'border-red-500/30' },
   vijaysales: { name: 'Vijay Sales', bg: 'bg-orange-500/10', text: 'text-orange-400', border: 'border-orange-500/30' },
+  dell: { name: 'Dell Store', bg: 'bg-blue-600/10', text: 'text-blue-400', border: 'border-blue-600/30' },
+  hp: { name: 'HP Store', bg: 'bg-sky-500/10', text: 'text-sky-400', border: 'border-sky-500/30' },
   lenovo: { name: 'Lenovo Store', bg: 'bg-cyan-500/10', text: 'text-cyan-400', border: 'border-cyan-500/30' },
   acer: { name: 'Acer Store', bg: 'bg-emerald-500/10', text: 'text-emerald-400', border: 'border-emerald-500/30' },
   asus: { name: 'ASUS eShop', bg: 'bg-purple-500/10', text: 'text-purple-400', border: 'border-purple-500/30' },
+  samsung: { name: 'Samsung Shop', bg: 'bg-indigo-500/10', text: 'text-indigo-400', border: 'border-indigo-500/30' },
+  apple: { name: 'Apple Store', bg: 'bg-slate-400/10', text: 'text-slate-300', border: 'border-slate-400/30' },
   tatacliq: { name: 'TataCliq', bg: 'bg-rose-500/10', text: 'text-rose-400', border: 'border-rose-500/30' },
 };
 
@@ -26,7 +31,17 @@ export const DealCard: React.FC<DealCardProps> = ({ deal, rankIndex }) => {
   const { product, effectivePrice, appliedOffer, savingsPercentage } = deal;
   const platformStyle = PLATFORM_STYLES[product.platform] || PLATFORM_STYLES.amazon;
 
-  const isLowVram = product.specs.vramGb < 6;
+  // Build live affiliate outbound link
+  const outboundAffiliateLink = buildLiveAffiliateLink(product.url, product.platform);
+
+  // Check category and spec attributes safely
+  const isLaptop = !product.category || product.category === 'laptops';
+  const isSmartphone = product.category === 'smartphones';
+  const isAudio = product.category === 'audio';
+  const isTv = product.category === 'smart-tvs';
+  const specs: any = product.specs;
+
+  const isLowVram = isLaptop && typeof specs.vramGb === 'number' && specs.vramGb > 0 && specs.vramGb < 6;
 
   return (
     <div
@@ -63,40 +78,107 @@ export const DealCard: React.FC<DealCardProps> = ({ deal, rankIndex }) => {
           </h3>
           {product.modelNumber && (
             <span className="text-[11px] font-mono text-slate-500">
-              Part No: {product.modelNumber}
+              Part / Model: {product.modelNumber}
             </span>
           )}
         </div>
 
-        {/* Spec Pills */}
+        {/* Spec Pills (Flexible by Category) */}
         <div className="grid grid-cols-2 gap-2 text-[11px] text-slate-300">
-          <div className="bg-slate-950/60 p-2 rounded-lg border border-slate-800/80 flex items-center gap-1.5">
-            <Cpu className="w-3.5 h-3.5 text-indigo-400 shrink-0" />
-            <span className="truncate">{product.specs.cpu.split('(')[0]}</span>
-          </div>
+          {isLaptop && (
+            <>
+              <div className="bg-slate-950/60 p-2 rounded-lg border border-slate-800/80 flex items-center gap-1.5">
+                <Cpu className="w-3.5 h-3.5 text-indigo-400 shrink-0" />
+                <span className="truncate">{specs.cpu?.split('(')[0] || 'High Performance CPU'}</span>
+              </div>
 
-          <div
-            className={`p-2 rounded-lg border flex items-center gap-1.5 ${
-              isLowVram
-                ? 'bg-rose-950/30 border-rose-800/50 text-rose-300'
-                : 'bg-slate-950/60 border-slate-800/80 text-slate-300'
-            }`}
-          >
-            <Monitor className="w-3.5 h-3.5 text-indigo-400 shrink-0" />
-            <span className="truncate">
-              {product.specs.gpu} {isLowVram ? '(4GB Warning)' : ''}
-            </span>
-          </div>
+              <div
+                className={`p-2 rounded-lg border flex items-center gap-1.5 ${
+                  isLowVram
+                    ? 'bg-rose-950/30 border-rose-800/50 text-rose-300'
+                    : 'bg-slate-950/60 border-slate-800/80 text-slate-300'
+                }`}
+              >
+                <Monitor className="w-3.5 h-3.5 text-indigo-400 shrink-0" />
+                <span className="truncate">
+                  {specs.gpu || 'Graphics'} {isLowVram ? '(4GB Warning)' : ''}
+                </span>
+              </div>
 
-          <div className="bg-slate-950/60 p-2 rounded-lg border border-slate-800/80 flex items-center gap-1.5">
-            <HardDrive className="w-3.5 h-3.5 text-indigo-400 shrink-0" />
-            <span>{product.specs.ramGb}GB RAM • {product.specs.storageGb}GB SSD</span>
-          </div>
+              <div className="bg-slate-950/60 p-2 rounded-lg border border-slate-800/80 flex items-center gap-1.5">
+                <HardDrive className="w-3.5 h-3.5 text-indigo-400 shrink-0" />
+                <span>{specs.ramGb || 16}GB RAM • {specs.storageGb || 512}GB SSD</span>
+              </div>
 
-          <div className="bg-slate-950/60 p-2 rounded-lg border border-slate-800/80 flex items-center gap-1.5">
-            <Monitor className="w-3.5 h-3.5 text-indigo-400 shrink-0" />
-            <span>{product.specs.refreshRateHz}Hz FHD Display</span>
-          </div>
+              <div className="bg-slate-950/60 p-2 rounded-lg border border-slate-800/80 flex items-center gap-1.5">
+                <Monitor className="w-3.5 h-3.5 text-indigo-400 shrink-0" />
+                <span>{specs.refreshRateHz || 144}Hz Display</span>
+              </div>
+            </>
+          )}
+
+          {isSmartphone && (
+            <>
+              <div className="bg-slate-950/60 p-2 rounded-lg border border-slate-800/80 flex items-center gap-1.5">
+                <Smartphone className="w-3.5 h-3.5 text-indigo-400 shrink-0" />
+                <span className="truncate">{specs.screen || 'OLED Display'}</span>
+              </div>
+              <div className="bg-slate-950/60 p-2 rounded-lg border border-slate-800/80 flex items-center gap-1.5">
+                <Cpu className="w-3.5 h-3.5 text-indigo-400 shrink-0" />
+                <span className="truncate">{specs.chip || 'Flagship SoC'}</span>
+              </div>
+              <div className="bg-slate-950/60 p-2 rounded-lg border border-slate-800/80 flex items-center gap-1.5">
+                <HardDrive className="w-3.5 h-3.5 text-indigo-400 shrink-0" />
+                <span>{specs.ramGb || 8}GB RAM • {specs.storageGb || 128}GB Storage</span>
+              </div>
+              <div className="bg-slate-950/60 p-2 rounded-lg border border-slate-800/80 flex items-center gap-1.5">
+                <Sparkles className="w-3.5 h-3.5 text-indigo-400 shrink-0" />
+                <span className="truncate">{specs.camera || 'Advanced Camera System'}</span>
+              </div>
+            </>
+          )}
+
+          {isAudio && (
+            <>
+              <div className="bg-slate-950/60 p-2 rounded-lg border border-slate-800/80 flex items-center gap-1.5">
+                <Headphones className="w-3.5 h-3.5 text-indigo-400 shrink-0" />
+                <span className="truncate">{specs.driver || 'Hi-Res Audio Driver'}</span>
+              </div>
+              <div className="bg-slate-950/60 p-2 rounded-lg border border-slate-800/80 flex items-center gap-1.5">
+                <Sparkles className="w-3.5 h-3.5 text-indigo-400 shrink-0" />
+                <span className="truncate">{specs.noiseCancelling || 'Active Noise Cancellation'}</span>
+              </div>
+              <div className="bg-slate-950/60 p-2 rounded-lg border border-slate-800/80 flex items-center gap-1.5">
+                <Check className="w-3.5 h-3.5 text-indigo-400 shrink-0" />
+                <span>{specs.batteryHours ? `${specs.batteryHours}h Battery Life` : 'All-Day Battery'}</span>
+              </div>
+              <div className="bg-slate-950/60 p-2 rounded-lg border border-slate-800/80 flex items-center gap-1.5">
+                <Monitor className="w-3.5 h-3.5 text-indigo-400 shrink-0" />
+                <span>{specs.weightGrams ? `${specs.weightGrams}g Ultra-light` : 'Lightweight'}</span>
+              </div>
+            </>
+          )}
+
+          {isTv && (
+            <>
+              <div className="bg-slate-950/60 p-2 rounded-lg border border-slate-800/80 flex items-center gap-1.5">
+                <Tv className="w-3.5 h-3.5 text-indigo-400 shrink-0" />
+                <span className="truncate">{specs.panel || '4K Ultra HD Display'}</span>
+              </div>
+              <div className="bg-slate-950/60 p-2 rounded-lg border border-slate-800/80 flex items-center gap-1.5">
+                <Cpu className="w-3.5 h-3.5 text-indigo-400 shrink-0" />
+                <span className="truncate">{specs.processor || 'Cognitive / AI Processor'}</span>
+              </div>
+              <div className="bg-slate-950/60 p-2 rounded-lg border border-slate-800/80 flex items-center gap-1.5">
+                <Monitor className="w-3.5 h-3.5 text-indigo-400 shrink-0" />
+                <span>{specs.refreshRateHz || 60}Hz • Dolby Vision / Atmos</span>
+              </div>
+              <div className="bg-slate-950/60 p-2 rounded-lg border border-slate-800/80 flex items-center gap-1.5">
+                <Sparkles className="w-3.5 h-3.5 text-indigo-400 shrink-0" />
+                <span>{specs.os || 'Google TV / Smart OS'}</span>
+              </div>
+            </>
+          )}
         </div>
 
         {isLowVram && (
@@ -142,7 +224,7 @@ export const DealCard: React.FC<DealCardProps> = ({ deal, rankIndex }) => {
             </div>
           ) : (
             <div className="text-[11px] text-slate-400 italic">
-              Base price shown (select a card above to unlock up to ₹26,250 instant discount).
+              Base price shown (select a card in your wallet above to unlock instant card discounts).
             </div>
           )}
         </div>
@@ -175,16 +257,17 @@ export const DealCard: React.FC<DealCardProps> = ({ deal, rankIndex }) => {
         </div>
       </div>
 
-      {/* Action Footer */}
+      {/* Action Footer with Live Affiliate Outbound Link */}
       <div className="p-4 bg-slate-950/60 border-t border-slate-800/80 flex items-center justify-between gap-3">
         <div className="text-[11px] text-slate-400">
           Rating: <strong className="text-white">★ {product.rating}</strong> ({product.ratingCount})
         </div>
         <a
-          href={product.url}
+          href={outboundAffiliateLink}
           target="_blank"
-          rel="noopener noreferrer"
+          rel="sponsored nofollow noopener noreferrer"
           className="px-4 py-2 rounded-xl text-xs font-bold bg-indigo-600 hover:bg-indigo-500 text-white flex items-center gap-1.5 transition-all shadow-md shadow-indigo-600/30"
+          title={`Opens ${platformStyle.name} store`}
         >
           View on {platformStyle.name}
           <ExternalLink className="w-3.5 h-3.5" />

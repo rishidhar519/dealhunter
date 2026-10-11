@@ -1,3 +1,10 @@
+export type ProductCategory =
+  | 'laptops'
+  | 'smartphones'
+  | 'audio'
+  | 'smart-tvs'
+  | 'all';
+
 export interface LaptopSpec {
   brand: string;
   modelName: string;
@@ -20,9 +27,13 @@ export type Platform =
   | 'croma'
   | 'reliancedigital'
   | 'vijaysales'
+  | 'dell'
+  | 'hp'
   | 'lenovo'
   | 'acer'
   | 'asus'
+  | 'samsung'
+  | 'apple'
   | 'tatacliq';
 
 export interface BankOffer {
@@ -41,33 +52,36 @@ export interface BankOffer {
 
 export interface ProductListing {
   id: string;
+  category: ProductCategory;
   title: string;
   brand: string;
   modelNumber?: string;
   platform: Platform;
   url: string;
+  affiliateUrl?: string;
   imageUrl: string;
   basePrice: number;
   mrp: number;
   inStock: boolean;
   rating: number;
   ratingCount: number;
-  specs: LaptopSpec;
+  specs: LaptopSpec | Record<string, any>;
   offers: BankOffer[];
   dealBadge?: 'Winner Deal' | 'Spec Upgrade' | 'Budget Champion' | 'Best Direct Match' | 'Top Pick';
   badgeReason?: string;
 }
 
 export interface DealSearchQuery {
+  category?: ProductCategory;
   cpuFilter?: string;
   minRamGb?: number;
   minStorageGb?: number;
   gpuFilter?: string;
   vramMinGb?: number;
   budgetMax?: number;
-  brand?: string; // empty means all brands
-  selectedCards?: string[]; // Multi-card wallet list e.g. ['SBI', 'ICICI', 'HDFC']
-  selectedBank?: string; // legacy single card fallback
+  brand?: string;
+  selectedCards?: string[];
+  selectedBank?: string;
   urlToCompare?: string;
 }
 
@@ -77,7 +91,7 @@ export interface CalculatedDeal {
   appliedOffer?: BankOffer;
   totalSavings: number;
   savingsPercentage: number;
-  matchScore: number; // 0-100
+  matchScore: number;
   matchTier: 'Exact Match' | 'Spec Upgrade' | 'Budget Equivalent' | 'Partial Match';
   aiNotes?: string;
 }
