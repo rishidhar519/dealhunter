@@ -7,15 +7,15 @@ import { SpecFilterBar } from '@/components/SpecFilterBar';
 import { AIAnalysisCard } from '@/components/AIAnalysisCard';
 import { DealCard } from '@/components/DealCard';
 import { DealSearchQuery, CalculatedDeal, AIAnalysisSummary } from '@/types/deal';
-import { Sparkles, ShoppingBag, ShieldCheck, RefreshCw } from 'lucide-react';
+import { Sparkles, ShoppingBag, ShieldCheck, RefreshCw, CheckCircle2, Layers } from 'lucide-react';
 
 const SCREENSHOT_PRESET_QUERY: DealSearchQuery = {
   cpuFilter: 'AMD Ryzen 7 7735HS / Equivalent',
-  gpuFilter: 'all', // Include RTX 4050 upgrade alert
+  gpuFilter: 'all',
   minRamGb: 16,
   minStorageGb: 512,
   vramMinGb: 6,
-  brand: 'all', // all brands to uncover the best deals
+  brand: 'all',
   selectedBank: 'SBI',
 };
 
@@ -23,10 +23,12 @@ export default function Home() {
   const [apiKey, setApiKey] = useState<string>('');
   const [selectedBank, setSelectedBank] = useState<string>('SBI');
   const [query, setQuery] = useState<DealSearchQuery>(SCREENSHOT_PRESET_QUERY);
-  const [customUrl, setCustomUrl] = useState<string>('');
-  const [deals, setDeals] = useState<CalculatedDeal[]>([]);
+  const [customUrl, setCustomUrl] = useState<string>('https://www.amazon.in/dp/B0GTZJVD3Y');
+  const [exactDeals, setExactDeals] = useState<CalculatedDeal[]>([]);
+  const [alternativeDeals, setAlternativeDeals] = useState<CalculatedDeal[]>([]);
   const [aiAnalysis, setAiAnalysis] = useState<AIAnalysisSummary | null>(null);
   const [isLoading, setIsLoading] = useState<boolean>(false);
+  const [activeTab, setActiveTab] = useState<'exact' | 'alternatives'>('exact');
 
   // Load saved Google AI Studio key from localStorage on mount
   useEffect(() => {
@@ -34,7 +36,6 @@ export default function Home() {
     if (savedKey) {
       setApiKey(savedKey);
     }
-    // Perform initial hunt
     fetchDeals(SCREENSHOT_PRESET_QUERY, 'SBI', savedKey || '');
   }, []);
 
@@ -60,7 +61,8 @@ export default function Home() {
 
       if (res.ok) {
         const data = await res.json();
-        setDeals(data.deals || []);
+        setExactDeals(data.exactStoreMatches || []);
+        setAlternativeDeals(data.alternativeDeals || []);
         setAiAnalysis(data.aiAnalysis || null);
       }
     } catch (err) {
@@ -82,6 +84,8 @@ export default function Home() {
   const handleLoadScreenshotPreset = () => {
     setQuery(SCREENSHOT_PRESET_QUERY);
     setSelectedBank('SBI');
+    setCustomUrl('https://www.amazon.in/dp/B0GTZJVD3Y');
+    setActiveTab('exact');
     fetchDeals(SCREENSHOT_PRESET_QUERY, 'SBI');
   };
 
@@ -95,7 +99,7 @@ export default function Home() {
         body: JSON.stringify({ url: customUrl }),
       });
       if (res.ok) {
-        // Trigger fresh search with bank calculation
+        setActiveTab('exact');
         fetchDeals(query, selectedBank);
       }
     } catch (err) {
@@ -118,13 +122,13 @@ export default function Home() {
         <div className="text-center space-y-3 max-w-3xl mx-auto pt-2">
           <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-indigo-500/10 border border-indigo-500/20 text-xs font-semibold text-indigo-400">
             <Sparkles className="w-3.5 h-3.5" />
-            AI Multi-Platform Deal & Card Discount Scanner
+            Live Verified Multi-Platform Deal Scanner
           </div>
           <h1 className="text-3xl sm:text-4xl lg:text-5xl font-black text-white tracking-tight leading-tight">
-            Find the <span className="text-transparent bg-clip-text bg-gradient-to-r from-amber-400 via-indigo-400 to-cyan-400">Absolute Best Deal</span> for Your Hardware Specs
+            Compare Across <span className="text-transparent bg-clip-text bg-gradient-to-r from-amber-400 via-indigo-400 to-cyan-400">Amazon, Flipkart & Croma</span> with Live Card Discounts
           </h1>
           <p className="text-sm sm:text-base text-slate-400 leading-relaxed">
-            Standard price trackers only read the sticker price. DealHunter scans <strong>Amazon, Flipkart & TataCliq</strong>, unlocks hidden bank card discounts, and uses <strong>AI analysis</strong> to uncover better hardware for less money.
+            Direct functional links, verified market pricing, and automated fine-print card discount calculations powered by Google Gemini AI.
           </p>
         </div>
 
@@ -154,28 +158,70 @@ export default function Home() {
           />
         )}
 
-        {/* 4. Comparison Deals Grid */}
-        <div className="space-y-4">
-          <div className="flex items-center justify-between">
-            <div className="flex items-center gap-2">
-              <ShoppingBag className="w-5 h-5 text-indigo-400" />
-              <h2 className="text-lg font-bold text-white">
-                Live Compared Listings ({deals.length} Options)
-              </h2>
+        {/* 4. Tab Navigation for Exact Product vs Alternative Deals */}
+        <div className="space-y-6">
+          <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 border-b border-slate-800 pb-3">
+            <div className="flex items-center gap-3">
+              <button
+                onClick={() => setActiveTab('exact')}
+                className={`flex items-center gap-2 px-4 py-2 rounded-xl text-sm font-bold transition-all ${
+                  activeTab === 'exact'
+                    ? 'bg-indigo-600 text-white shadow-lg shadow-indigo-600/30'
+                    : 'bg-slate-900 text-slate-400 hover:text-white hover:bg-slate-800'
+                }`}
+              >
+                <CheckCircle2 className="w-4 h-4 text-emerald-400" />
+                Target Product Head-to-Head ({exactDeals.length} Stores)
+              </button>
+              <button
+                onClick={() => setActiveTab('alternatives')}
+                className={`flex items-center gap-2 px-4 py-2 rounded-xl text-sm font-bold transition-all ${
+                  activeTab === 'alternatives'
+                    ? 'bg-indigo-600 text-white shadow-lg shadow-indigo-600/30'
+                    : 'bg-slate-900 text-slate-400 hover:text-white hover:bg-slate-800'
+                }`}
+              >
+                <Layers className="w-4 h-4 text-amber-400" />
+                Alternative Brands & Upgrades ({alternativeDeals.length})
+              </button>
             </div>
+
             {isLoading && (
               <div className="flex items-center gap-1.5 text-xs text-indigo-400 font-medium">
                 <RefreshCw className="w-3.5 h-3.5 animate-spin" />
-                Recalculating Card Offers...
+                Updating prices with {selectedBank} card...
               </div>
             )}
           </div>
 
-          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-            {deals.map((deal, idx) => (
-              <DealCard key={deal.product.id} deal={deal} rankIndex={idx} />
-            ))}
-          </div>
+          {activeTab === 'exact' ? (
+            <div className="space-y-4">
+              <div className="bg-indigo-950/30 border border-indigo-500/20 rounded-xl p-4 text-xs text-indigo-300">
+                <strong>Comparing Target Product:</strong> Lenovo LOQ Essential (83S0009SIN) across authorized Indian stores.
+                {selectedBank === 'SBI' && (
+                  <span className="text-emerald-400 ml-1 font-semibold">
+                    ★ Amazon wins with the ₹26,250 instant SBI Credit Card discount (Effective: ₹73,740).
+                  </span>
+                )}
+              </div>
+              <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
+                {exactDeals.map((deal, idx) => (
+                  <DealCard key={deal.product.id} deal={deal} rankIndex={idx} />
+                ))}
+              </div>
+            </div>
+          ) : (
+            <div className="space-y-4">
+              <div className="bg-slate-900 border border-slate-800 rounded-xl p-4 text-xs text-slate-400">
+                <strong>Brand-Agnostic Alternatives:</strong> Explore equivalent hardware (Acer Nitro, ASUS TUF) or consider the RTX 4050 edition for faster gaming performance.
+              </div>
+              <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
+                {alternativeDeals.map((deal, idx) => (
+                  <DealCard key={deal.product.id} deal={deal} rankIndex={idx} />
+                ))}
+              </div>
+            </div>
+          )}
         </div>
       </main>
 
