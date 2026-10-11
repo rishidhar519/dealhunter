@@ -77,7 +77,7 @@ export const COMPREHENSIVE_STORE_CATALOG: ProductListing[] = [
     brand: 'HP',
     modelNumber: '15-fb2000AX',
     platform: 'hp',
-    url: 'https://www.hp.com/in-en/shop/laptops-tablets/gaming-laptops.html?filter_facet_graphic_card_series=NVIDIA%20GeForce%20RTX%203050',
+    url: 'https://www.hp.com/in-en/shop/laptops/gaming-laptops/victus-by-hp.html',
     imageUrl: 'https://images.unsplash.com/photo-1525547719571-a2d4ac8945e2?auto=format&fit=crop&w=600&q=80',
     basePrice: 72990,
     mrp: 88499,
