@@ -16,7 +16,7 @@ export const BankCardSelector: React.FC<BankCardSelectorProps> = ({
     {
       id: 'SBI',
       name: 'SBI Credit Card',
-      badge: 'Up to ₹26,250 Off (Amazon)',
+      badge: 'Save ₹16,250 on Amazon',
       badgeColor: 'text-amber-400 bg-amber-400/10 border-amber-400/20',
       activeBorder: 'border-amber-500 bg-amber-500/10 text-white',
     },

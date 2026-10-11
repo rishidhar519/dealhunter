@@ -200,7 +200,7 @@ export default function Home() {
                 <strong>Comparing Target Product:</strong> Lenovo LOQ Essential (83S0009SIN) across authorized Indian stores.
                 {selectedBank === 'SBI' && (
                   <span className="text-emerald-400 ml-1 font-semibold">
-                    ★ Amazon wins with the ₹26,250 instant SBI Credit Card discount (Effective: ₹73,740).
+                    ★ Amazon wins with the ₹16,250 instant SBI Card discount (Effective: ₹83,740).
                   </span>
                 )}
               </div>

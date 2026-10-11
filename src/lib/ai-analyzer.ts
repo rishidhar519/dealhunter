@@ -149,12 +149,12 @@ Return only JSON without markdown formatting.`;
     'VRAM Alert: Avoid 4GB variants of RTX 3050 (like ASUS TUF FA506NC) as modern AAA games require at least 6GB VRAM for high textures.',
     'Killer Upgrade: The Lenovo LOQ RTX 4050 6GB edition sits at ~₹72,490 net, offering 35% higher FPS + DLSS 3 Frame Generation for nearly the same price.',
     'CPU Equivalence: AMD Ryzen 7 7735HS, Ryzen 7 7435HS, and Intel i5-13420H/13450HX perform similarly in 1080p gaming benchmarks (within 4% delta).',
-    'Bank Offer Impact: Amazon has an outsized ₹26,250 instant discount on SBI Cards for the LOQ 83S0009SIN, whereas Flipkart leads on HDFC & Axis bank cards.',
+    'Bank Offer Impact: Amazon provides an instant ₹16,250 discount on SBI Credit/Debit Cards for the LOQ 83S0009SIN, bringing the ₹99,990 listed price down to ₹83,740.',
   ];
 
   const hiddenSavings = [
     `With ${selectedBank} Credit Card selected, the effective price drops up to ₹${Math.max(...calculatedDeals.map(d => d.appliedOffer?.discountAmount || 0)).toLocaleString('en-IN')}.`,
-    'No-Cost EMI on Amazon allows spreading payments over 9 months without paying standard 14-16% interest.',
+    'No-Cost EMI on Amazon allows spreading payments with ₹16,500 savings on EMI plans.',
     'Official Lenovo Online store offers an extra ₹2,500 student eCoupon (SheerID) stackable with 5% Credit Card cashback.',
   ];
 
@@ -162,7 +162,7 @@ Return only JSON without markdown formatting.`;
     bestDirectMatch: directMatch,
     bestValueUpgrade: upgradeMatch,
     budgetChampion: budgetMatch,
-    editorialVerdict: `While the Lenovo LOQ Essential (83S0009SIN) has a massive ₹26,250 SBI Card discount on Amazon (bringing it to ₹73,740), you can get the superior RTX 4050 edition for ₹72,490 on Amazon or the Acer Nitro V 15 on Flipkart for ₹59,990. We recommend the RTX 4050 model for maximum longevity.`,
+    editorialVerdict: `The Lenovo LOQ Essential (83S0009SIN) offers a direct ₹16,250 discount on SBI Cards on Amazon (bringing ₹99,990 down to ₹83,740 net). On EMI, you save ₹16,500. Comparing across stores, Amazon leads for SBI holders, while Flipkart and Croma remain competitive for HDFC/Axis users.`,
     specComparisonHighlights: highlights,
     hiddenSavingsNotes: hiddenSavings,
     usedAiModel: 'heuristic-engine',
