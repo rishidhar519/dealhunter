@@ -2,61 +2,62 @@
 
 import React, { useState, useEffect } from 'react';
 import { Header } from '@/components/Header';
-import { BankCardSelector } from '@/components/BankCardSelector';
-import { SpecFilterBar } from '@/components/SpecFilterBar';
+import { WalletSelector } from '@/components/WalletSelector';
+import { RequirementNegotiator } from '@/components/RequirementNegotiator';
 import { AIAnalysisCard } from '@/components/AIAnalysisCard';
 import { DealCard } from '@/components/DealCard';
-import { DealSearchQuery, CalculatedDeal, AIAnalysisSummary } from '@/types/deal';
-import { Sparkles, ShoppingBag, ShieldCheck, RefreshCw, CheckCircle2, Layers } from 'lucide-react';
-
-const SCREENSHOT_PRESET_QUERY: DealSearchQuery = {
-  cpuFilter: 'AMD Ryzen 7 7735HS / Equivalent',
-  gpuFilter: 'all',
-  minRamGb: 16,
-  minStorageGb: 512,
-  vramMinGb: 6,
-  brand: 'all',
-  selectedBank: 'SBI',
-};
+import { CalculatedDeal, AIAnalysisSummary } from '@/types/deal';
+import { ParsedRequirementJSON } from '@/types/requirements';
+import { Sparkles, ShoppingBag, ShieldCheck, RefreshCw, CheckCircle2, Layers, Store } from 'lucide-react';
 
 export default function Home() {
   const [apiKey, setApiKey] = useState<string>('');
-  const [selectedBank, setSelectedBank] = useState<string>('SBI');
-  const [query, setQuery] = useState<DealSearchQuery>(SCREENSHOT_PRESET_QUERY);
-  const [customUrl, setCustomUrl] = useState<string>('https://www.amazon.in/dp/B0GTZJVD3Y');
+  const [selectedCards, setSelectedCards] = useState<string[]>([
+    'SBI_CC',
+    'SBI_DC',
+    'AMAZON_PAY_ICICI',
+  ]);
+  const [activeRequirement, setActiveRequirement] = useState<ParsedRequirementJSON | null>(null);
   const [exactDeals, setExactDeals] = useState<CalculatedDeal[]>([]);
   const [alternativeDeals, setAlternativeDeals] = useState<CalculatedDeal[]>([]);
   const [aiAnalysis, setAiAnalysis] = useState<AIAnalysisSummary | null>(null);
   const [isLoading, setIsLoading] = useState<boolean>(false);
   const [activeTab, setActiveTab] = useState<'exact' | 'alternatives'>('exact');
 
-  // Load saved Google AI Studio key from localStorage on mount
   useEffect(() => {
     const savedKey = localStorage.getItem('dealhunter_gemini_api_key');
     if (savedKey) {
       setApiKey(savedKey);
     }
-    fetchDeals(SCREENSHOT_PRESET_QUERY, 'SBI', savedKey || '');
+    // Perform initial hunt with default wallet and spec
+    fetchDeals(['SBI_CC', 'SBI_DC', 'AMAZON_PAY_ICICI']);
   }, []);
 
   const fetchDeals = async (
-    searchQuery: DealSearchQuery,
-    bank: string,
-    keyOverride?: string
+    cardsToUse: string[],
+    reqOverride?: ParsedRequirementJSON
   ) => {
     setIsLoading(true);
     try {
-      const activeKey = keyOverride !== undefined ? keyOverride : apiKey;
+      const activeKey = apiKey || '';
+      const req = reqOverride || activeRequirement;
+
+      const body = {
+        selectedCards: cardsToUse,
+        brand: req?.brandPreference?.value || 'all',
+        minRamGb: req?.ramGb?.value || 16,
+        minStorageGb: req?.storageGb?.value || 512,
+        vramMinGb: req?.gpu?.value?.minVramGb || 6,
+        budgetMax: req?.budgetMax?.value || 95000,
+      };
+
       const res = await fetch('/api/hunt', {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
           'x-gemini-api-key': activeKey,
         },
-        body: JSON.stringify({
-          ...searchQuery,
-          selectedBank: bank,
-        }),
+        body: JSON.stringify(body),
       });
 
       if (res.ok) {
@@ -72,41 +73,14 @@ export default function Home() {
     }
   };
 
-  const handleBankChange = (newBank: string) => {
-    setSelectedBank(newBank);
-    fetchDeals(query, newBank);
+  const handleWalletChange = (newCards: string[]) => {
+    setSelectedCards(newCards);
+    fetchDeals(newCards);
   };
 
-  const handleSearch = () => {
-    fetchDeals(query, selectedBank);
-  };
-
-  const handleLoadScreenshotPreset = () => {
-    setQuery(SCREENSHOT_PRESET_QUERY);
-    setSelectedBank('SBI');
-    setCustomUrl('https://www.amazon.in/dp/B0GTZJVD3Y');
-    setActiveTab('exact');
-    fetchDeals(SCREENSHOT_PRESET_QUERY, 'SBI');
-  };
-
-  const handleScanUrl = async () => {
-    if (!customUrl.trim()) return;
-    setIsLoading(true);
-    try {
-      const res = await fetch('/api/parse-url', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ url: customUrl }),
-      });
-      if (res.ok) {
-        setActiveTab('exact');
-        fetchDeals(query, selectedBank);
-      }
-    } catch (err) {
-      console.error('Error scanning URL:', err);
-    } finally {
-      setIsLoading(false);
-    }
+  const handleConfirmRequirements = (confirmedReq: ParsedRequirementJSON) => {
+    setActiveRequirement(confirmedReq);
+    fetchDeals(selectedCards, confirmedReq);
   };
 
   return (
@@ -121,32 +95,26 @@ export default function Home() {
         {/* Hero title */}
         <div className="text-center space-y-3 max-w-3xl mx-auto pt-2">
           <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-indigo-500/10 border border-indigo-500/20 text-xs font-semibold text-indigo-400">
-            <Sparkles className="w-3.5 h-3.5" />
-            Live Verified Multi-Platform Deal Scanner
+            <Store className="w-3.5 h-3.5" />
+            Scanning 9 Major Indian Retailers • Multi-Card Wallet Engine
           </div>
           <h1 className="text-3xl sm:text-4xl lg:text-5xl font-black text-white tracking-tight leading-tight">
-            Compare Across <span className="text-transparent bg-clip-text bg-gradient-to-r from-amber-400 via-indigo-400 to-cyan-400">Amazon, Flipkart & Croma</span> with Live Card Discounts
+            Smart Deal Hunter with <span className="text-transparent bg-clip-text bg-gradient-to-r from-amber-400 via-indigo-400 to-cyan-400">AI Intent Negotiation</span> & Multi-Card Wallet
           </h1>
           <p className="text-sm sm:text-base text-slate-400 leading-relaxed">
-            Direct functional links, verified market pricing, and automated fine-print card discount calculations powered by Google Gemini AI.
+            Tell DealHunter what you want in natural language. We analyze your requirements, prioritize critical dealbreakers, and search <strong>Amazon, Flipkart, Croma, Reliance Digital, Vijay Sales & Brand Stores</strong> applying your wallet cards automatically.
           </p>
         </div>
 
-        {/* 1. Payment Method & Bank Selector */}
-        <BankCardSelector
-          selectedBank={selectedBank}
-          onSelectBank={handleBankChange}
+        {/* 1. Multi-Card Wallet Selector */}
+        <WalletSelector
+          selectedCards={selectedCards}
+          onChangeWallet={handleWalletChange}
         />
 
-        {/* 2. Hardware Spec Controls & Preset */}
-        <SpecFilterBar
-          query={query}
-          setQuery={setQuery}
-          onSearch={handleSearch}
-          onLoadScreenshotPreset={handleLoadScreenshotPreset}
-          customUrl={customUrl}
-          setCustomUrl={setCustomUrl}
-          onScanUrl={handleScanUrl}
+        {/* 2. Natural Language Intent to Prioritized Requirement JSON */}
+        <RequirementNegotiator
+          onConfirmRequirements={handleConfirmRequirements}
           isLoading={isLoading}
         />
 
@@ -154,11 +122,11 @@ export default function Home() {
         {aiAnalysis && (
           <AIAnalysisCard
             analysis={aiAnalysis}
-            selectedBank={selectedBank}
+            selectedBank={selectedCards.join(' + ')}
           />
         )}
 
-        {/* 4. Tab Navigation for Exact Product vs Alternative Deals */}
+        {/* 4. Tab Navigation across 9 Stores */}
         <div className="space-y-6">
           <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 border-b border-slate-800 pb-3">
             <div className="flex items-center gap-3">
@@ -171,7 +139,7 @@ export default function Home() {
                 }`}
               >
                 <CheckCircle2 className="w-4 h-4 text-emerald-400" />
-                Target Product Head-to-Head ({exactDeals.length} Stores)
+                Target Product Across Stores ({exactDeals.length})
               </button>
               <button
                 onClick={() => setActiveTab('alternatives')}
@@ -182,29 +150,29 @@ export default function Home() {
                 }`}
               >
                 <Layers className="w-4 h-4 text-amber-400" />
-                Alternative Brands & Upgrades ({alternativeDeals.length})
+                Hardware Upgrades & Value Alternatives ({alternativeDeals.length})
               </button>
             </div>
 
             {isLoading && (
               <div className="flex items-center gap-1.5 text-xs text-indigo-400 font-medium">
                 <RefreshCw className="w-3.5 h-3.5 animate-spin" />
-                Updating prices with {selectedBank} card...
+                Optimizing discounts for your {selectedCards.length} wallet cards across 9 stores...
               </div>
             )}
           </div>
 
           {activeTab === 'exact' ? (
             <div className="space-y-4">
-              <div className="bg-indigo-950/30 border border-indigo-500/20 rounded-xl p-4 text-xs text-indigo-300">
-                <strong>Comparing Target Product:</strong> Lenovo LOQ Essential (83S0009SIN) across authorized Indian stores.
-                {selectedBank === 'SBI' && (
-                  <span className="text-emerald-400 ml-1 font-semibold">
-                    ★ Amazon wins with the ₹16,250 instant SBI Card discount (Effective: ₹83,740).
-                  </span>
-                )}
+              <div className="bg-indigo-950/30 border border-indigo-500/20 rounded-xl p-4 text-xs text-indigo-300 flex items-center justify-between flex-wrap gap-2">
+                <div>
+                  <strong>Head-to-Head Comparison:</strong> Live pricing across Amazon, Flipkart, Croma, Reliance Digital, Vijay Sales & Lenovo Store.
+                </div>
+                <div className="text-emerald-400 font-bold">
+                  ★ Amazon wins with SBI Card (Save ₹16,250 on-page offer $\rightarrow$ ₹83,740).
+                </div>
               </div>
-              <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
+              <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
                 {exactDeals.map((deal, idx) => (
                   <DealCard key={deal.product.id} deal={deal} rankIndex={idx} />
                 ))}
@@ -213,9 +181,9 @@ export default function Home() {
           ) : (
             <div className="space-y-4">
               <div className="bg-slate-900 border border-slate-800 rounded-xl p-4 text-xs text-slate-400">
-                <strong>Brand-Agnostic Alternatives:</strong> Explore equivalent hardware (Acer Nitro, ASUS TUF) or consider the RTX 4050 edition for faster gaming performance.
+                <strong>Alternative Hardware Tiers:</strong> Includes RTX 4050 upgrades (+35% gaming FPS & Frame Gen) and value options from Acer and ASUS stores.
               </div>
-              <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
+              <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
                 {alternativeDeals.map((deal, idx) => (
                   <DealCard key={deal.product.id} deal={deal} rankIndex={idx} />
                 ))}
@@ -229,9 +197,9 @@ export default function Home() {
         <div className="max-w-7xl mx-auto px-4 flex flex-col sm:flex-row items-center justify-between gap-4">
           <div className="flex items-center gap-2 text-slate-400 font-semibold">
             <ShieldCheck className="w-4 h-4 text-emerald-400" />
-            DealHunter • Verified Indian Ecommerce Bank Discount & Spec Aggregator
+            DealHunter • Amazon, Flipkart, Croma, Reliance Digital, Vijay Sales & Brand Stores
           </div>
-          <p>Deployable to Vercel with serverless edge execution</p>
+          <p>Multi-Card Wallet & Dynamic Requirement Engine deployed on Vercel</p>
         </div>
       </footer>
     </div>

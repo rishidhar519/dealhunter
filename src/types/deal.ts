@@ -14,11 +14,20 @@ export interface LaptopSpec {
   os: string;
 }
 
-export type Platform = 'amazon' | 'flipkart' | 'tatacliq' | 'croma' | 'lenovo';
+export type Platform =
+  | 'amazon'
+  | 'flipkart'
+  | 'croma'
+  | 'reliancedigital'
+  | 'vijaysales'
+  | 'lenovo'
+  | 'acer'
+  | 'asus'
+  | 'tatacliq';
 
 export interface BankOffer {
   id: string;
-  bank: 'SBI' | 'HDFC' | 'ICICI' | 'Axis' | 'Flipkart Axis' | 'Any Credit Card' | 'Other';
+  bank: 'SBI' | 'HDFC' | 'ICICI' | 'Axis' | 'Kotak' | 'Flipkart Axis' | 'Amazon Pay ICICI' | 'Any Credit Card' | 'Other';
   cardType: 'credit' | 'debit' | 'all';
   discountAmount: number;
   discountPercentage?: number;
@@ -45,7 +54,7 @@ export interface ProductListing {
   ratingCount: number;
   specs: LaptopSpec;
   offers: BankOffer[];
-  dealBadge?: 'Winner Deal' | 'Spec Upgrade' | 'Budget Champion' | 'Best Direct Match';
+  dealBadge?: 'Winner Deal' | 'Spec Upgrade' | 'Budget Champion' | 'Best Direct Match' | 'Top Pick';
   badgeReason?: string;
 }
 
@@ -55,8 +64,10 @@ export interface DealSearchQuery {
   minStorageGb?: number;
   gpuFilter?: string;
   vramMinGb?: number;
+  budgetMax?: number;
   brand?: string; // empty means all brands
-  selectedBank?: string; // e.g. 'SBI', 'HDFC', 'ICICI', 'Axis', 'NONE'
+  selectedCards?: string[]; // Multi-card wallet list e.g. ['SBI', 'ICICI', 'HDFC']
+  selectedBank?: string; // legacy single card fallback
   urlToCompare?: string;
 }
 

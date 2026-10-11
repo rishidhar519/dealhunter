@@ -12,9 +12,13 @@ interface DealCardProps {
 const PLATFORM_STYLES: Record<Platform, { name: string; bg: string; text: string; border: string }> = {
   amazon: { name: 'Amazon India', bg: 'bg-amber-500/10', text: 'text-amber-400', border: 'border-amber-500/30' },
   flipkart: { name: 'Flipkart', bg: 'bg-blue-500/10', text: 'text-blue-400', border: 'border-blue-500/30' },
-  tatacliq: { name: 'TataCliq', bg: 'bg-rose-500/10', text: 'text-rose-400', border: 'border-rose-500/30' },
   croma: { name: 'Croma', bg: 'bg-teal-500/10', text: 'text-teal-400', border: 'border-teal-500/30' },
+  reliancedigital: { name: 'Reliance Digital', bg: 'bg-red-500/10', text: 'text-red-400', border: 'border-red-500/30' },
+  vijaysales: { name: 'Vijay Sales', bg: 'bg-orange-500/10', text: 'text-orange-400', border: 'border-orange-500/30' },
   lenovo: { name: 'Lenovo Store', bg: 'bg-cyan-500/10', text: 'text-cyan-400', border: 'border-cyan-500/30' },
+  acer: { name: 'Acer Store', bg: 'bg-emerald-500/10', text: 'text-emerald-400', border: 'border-emerald-500/30' },
+  asus: { name: 'ASUS eShop', bg: 'bg-purple-500/10', text: 'text-purple-400', border: 'border-purple-500/30' },
+  tatacliq: { name: 'TataCliq', bg: 'bg-rose-500/10', text: 'text-rose-400', border: 'border-rose-500/30' },
 };
 
 export const DealCard: React.FC<DealCardProps> = ({ deal, rankIndex }) => {

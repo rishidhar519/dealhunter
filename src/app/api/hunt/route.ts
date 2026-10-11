@@ -1,56 +1,83 @@
 import { NextResponse } from 'next/server';
-import { EXACT_PRODUCT_STORE_LISTINGS, ALTERNATIVE_HARDWARE_DEALS, ALL_LAPTOP_DEALS } from '@/lib/deals-database';
+import { COMPREHENSIVE_STORE_CATALOG } from '@/lib/deals-database';
 import { calculateEffectiveDeal, analyzeDealsWithAI } from '@/lib/ai-analyzer';
 import { DealSearchQuery } from '@/types/deal';
 
 export async function POST(req: Request) {
   try {
-    const body: DealSearchQuery = await req.json();
+    const body: DealSearchQuery & { userWallet?: string[] } = await req.json();
     const apiKey = req.headers.get('x-gemini-api-key') || process.env.GEMINI_API_KEY || '';
-    const selectedBank = body.selectedBank || 'SBI';
 
-    // 1. Calculate deals for the Exact Laptop across all stores
-    const exactMatches = EXACT_PRODUCT_STORE_LISTINGS.map((product) =>
-      calculateEffectiveDeal(product, selectedBank)
-    );
-    // Sort exact matches by effective price
-    exactMatches.sort((a, b) => a.effectivePrice - b.effectivePrice);
+    // Multi-card wallet
+    const activeWallet: string[] =
+      body.selectedCards && body.selectedCards.length > 0
+        ? body.selectedCards
+        : body.selectedBank
+        ? [body.selectedBank]
+        : ['SBI_CC', 'AMAZON_PAY_ICICI'];
 
-    // 2. Filter and calculate alternative hardware deals
-    let alternativeListings = [...ALTERNATIVE_HARDWARE_DEALS];
+    let candidateListings = [...COMPREHENSIVE_STORE_CATALOG];
 
-    if (body.brand && body.brand.trim() !== '' && body.brand.toLowerCase() !== 'all') {
-      alternativeListings = alternativeListings.filter(
+    // Filter by Brand if specified
+    if (body.brand && body.brand.trim() !== '' && body.brand.toLowerCase() !== 'all' && body.brand.toLowerCase() !== 'any') {
+      candidateListings = candidateListings.filter(
         (p) => p.brand.toLowerCase() === body.brand?.toLowerCase()
       );
     }
 
-    if (body.gpuFilter && body.gpuFilter !== 'all') {
-      if (body.gpuFilter.includes('4050')) {
-        alternativeListings = alternativeListings.filter((p) => p.specs.gpu.includes('4050'));
-      } else if (body.gpuFilter.includes('3050')) {
-        alternativeListings = alternativeListings.filter((p) => p.specs.gpu.includes('3050'));
-      }
+    // Filter by Min RAM
+    if (body.minRamGb) {
+      candidateListings = candidateListings.filter((p) => p.specs.ramGb >= (body.minRamGb || 16));
     }
 
-    const alternativeDeals = alternativeListings.map((product) =>
-      calculateEffectiveDeal(product, selectedBank)
+    // Filter by Min Storage
+    if (body.minStorageGb) {
+      candidateListings = candidateListings.filter((p) => p.specs.storageGb >= (body.minStorageGb || 512));
+    }
+
+    // Filter by Min VRAM
+    if (body.vramMinGb) {
+      candidateListings = candidateListings.filter((p) => p.specs.vramGb >= (body.vramMinGb || 6));
+    }
+
+    // Filter by Max Budget if specified
+    if (body.budgetMax && body.budgetMax > 0) {
+      candidateListings = candidateListings.filter((p) => p.basePrice <= body.budgetMax! * 1.15); // Allow slight buffer before discounts
+    }
+
+    // Calculate effective price using user's multi-card wallet
+    const calculatedDeals = candidateListings.map((product) =>
+      calculateEffectiveDeal(product, activeWallet)
     );
-    alternativeDeals.sort((a, b) => a.effectivePrice - b.effectivePrice);
 
-    // All deals combined
-    const allCalculated = [...exactMatches, ...alternativeDeals];
+    // Sort by effective price ascending
+    calculatedDeals.sort((a, b) => a.effectivePrice - b.effectivePrice);
 
-    // AI Analysis
-    const querySummary = `Target Laptop: Lenovo LOQ Essential (83S0009SIN) [AMD Ryzen 7 7735HS, RTX 3050 6GB, 16GB RAM, 512GB SSD]. Comparing live across Amazon, Flipkart, Croma, and Lenovo Store with ${selectedBank} payment.`;
-    const aiAnalysis = await analyzeDealsWithAI(allCalculated, querySummary, selectedBank, apiKey);
+    // Separate into exact SKU matches vs alternative deals
+    const exactMatches = calculatedDeals.filter(
+      (d) => d.product.modelNumber?.includes('83S0009SIN') || d.product.title.toLowerCase().includes('essential')
+    );
+
+    const alternativeDeals = calculatedDeals.filter(
+      (d) => !d.product.modelNumber?.includes('83S0009SIN') && !d.product.title.toLowerCase().includes('essential')
+    );
+
+    // Run AI analysis
+    const querySummary = `Wallet Cards: [${activeWallet.join(', ')}]. Specs: Min ${body.minRamGb || 16}GB RAM, ${body.vramMinGb || 6}GB+ VRAM, Budget Max ₹${(body.budgetMax || 95000).toLocaleString('en-IN')}.`;
+    const aiAnalysis = await analyzeDealsWithAI(
+      calculatedDeals,
+      querySummary,
+      activeWallet.join(' / '),
+      apiKey
+    );
 
     return NextResponse.json({
-      exactStoreMatches: exactMatches,
-      alternativeDeals,
-      allDeals: allCalculated,
+      exactStoreMatches: exactMatches.length > 0 ? exactMatches : calculatedDeals.slice(0, 4),
+      alternativeDeals: alternativeDeals.length > 0 ? alternativeDeals : calculatedDeals.slice(4),
+      allDeals: calculatedDeals,
       aiAnalysis,
-      selectedBank,
+      activeWallet,
+      totalStoresScanned: 9,
     });
   } catch (error) {
     console.error('Error in /api/hunt:', error);

@@ -2,24 +2,43 @@ import { ProductListing, CalculatedDeal, AIAnalysisSummary, BankOffer } from '@/
 
 export function calculateEffectiveDeal(
   product: ProductListing,
-  selectedBank: string = 'SBI'
+  userWalletCards: string[] = ['SBI_CC', 'AMAZON_PAY_ICICI']
 ): CalculatedDeal {
   let appliedOffer: BankOffer | undefined;
+  let maxDiscount = 0;
 
-  if (selectedBank && selectedBank !== 'NONE') {
-    // Look for exact bank match or "Any Credit Card"
-    appliedOffer = product.offers.find(
-      (o) =>
-        o.bank.toLowerCase() === selectedBank.toLowerCase() ||
-        (selectedBank === 'Axis' && o.bank === 'Flipkart Axis') ||
-        o.bank === 'Any Credit Card'
-    );
+  // Evaluate every offer on this product against the user's active wallet cards
+  for (const offer of product.offers) {
+    const bank = offer.bank.toLowerCase();
+    const isMatched =
+      userWalletCards.some((card) => {
+        const c = card.toUpperCase();
+        if (c.startsWith('SBI') && bank.includes('sbi')) return true;
+        if (c.includes('ICICI') && bank.includes('icici')) return true;
+        if (c.startsWith('HDFC') && bank.includes('hdfc')) return true;
+        if (c.includes('AXIS') && bank.includes('axis')) return true;
+        if (c === 'ANY_CREDIT_CARD' && (bank.includes('any credit card') || offer.cardType === 'credit')) return true;
+        if (c.includes('UPI') && (bank.includes('other') || offer.description.toLowerCase().includes('upi'))) return true;
+        return false;
+      });
+
+    if (isMatched && offer.discountAmount > maxDiscount) {
+      maxDiscount = offer.discountAmount;
+      appliedOffer = offer;
+    }
   }
 
-  // If no bank specified or matched, default to general non-card offer or lowest cashback
-  const discount = appliedOffer?.discountAmount || 0;
-  const effectivePrice = Math.max(0, product.basePrice - discount);
-  const totalSavings = (product.mrp - effectivePrice);
+  // If no card matched, check if there is a general UPI / non-card offer
+  if (!appliedOffer) {
+    const fallback = product.offers.find((o) => o.bank === 'Other' || o.cardType === 'all');
+    if (fallback) {
+      appliedOffer = fallback;
+      maxDiscount = fallback.discountAmount;
+    }
+  }
+
+  const effectivePrice = Math.max(0, product.basePrice - maxDiscount);
+  const totalSavings = product.mrp - effectivePrice;
   const savingsPercentage = Math.round((totalSavings / product.mrp) * 100);
 
   // Match scoring
@@ -32,7 +51,7 @@ export function calculateEffectiveDeal(
   } else if (product.specs.vramGb < 6) {
     matchTier = 'Partial Match';
     matchScore = 75;
-  } else if (product.basePrice < 68000) {
+  } else if (product.basePrice < 75000) {
     matchTier = 'Budget Equivalent';
     matchScore = 92;
   }

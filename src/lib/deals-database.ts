@@ -1,11 +1,10 @@
 import { ProductListing } from '@/types/deal';
 
-// 1. Direct Cross-Platform Listings for the Exact Laptop from User's Screenshot:
-// Lenovo LOQ Essential (83S0009SIN) - Ryzen 7 7735HS, RTX 3050 6GB, 16GB, 512GB
-export const EXACT_PRODUCT_STORE_LISTINGS: ProductListing[] = [
+export const COMPREHENSIVE_STORE_CATALOG: ProductListing[] = [
+  // 1. Amazon India - Target Lenovo LOQ 83S0009SIN (From live screenshot with carousel offers)
   {
-    id: 'lenovo-loq-83s0009sin-amazon',
-    title: 'Lenovo LOQ Essential AMD Ryzen 7 7735HS | NVIDIA RTX 3050 6GB (16GB RAM/512GB SSD/144Hz/15.6" FHD/Win 11/Office 2024)',
+    id: 'amazon-lenovo-loq-83s0009sin',
+    title: 'Lenovo LOQ Essential AMD Ryzen 7 7735HS | NVIDIA RTX 3050 6GB (16GB RAM/512GB SSD/144Hz/15.6" FHD/Win 11/Office 2024), 83S0009SIN',
     brand: 'Lenovo',
     modelNumber: '83S0009SIN',
     platform: 'amazon',
@@ -14,8 +13,8 @@ export const EXACT_PRODUCT_STORE_LISTINGS: ProductListing[] = [
     basePrice: 99990,
     mrp: 108890,
     inStock: true,
-    rating: 3.5,
-    ratingCount: 50,
+    rating: 3.8,
+    ratingCount: 100,
     specs: {
       brand: 'Lenovo',
       modelName: 'LOQ Essential 83S0009SIN',
@@ -37,7 +36,7 @@ export const EXACT_PRODUCT_STORE_LISTINGS: ProductListing[] = [
         bank: 'SBI',
         cardType: 'credit',
         discountAmount: 16250,
-        description: 'Save ₹16,250 with SBI Credit Card (Full Payment)',
+        description: 'Save ₹16,250 with SBI Credit Card (On-page Carousel Offer)',
         isNoCostEmi: false,
       },
       {
@@ -45,7 +44,7 @@ export const EXACT_PRODUCT_STORE_LISTINGS: ProductListing[] = [
         bank: 'SBI',
         cardType: 'debit',
         discountAmount: 16250,
-        description: 'Save ₹16,250 with SBI Debit Card (Full Payment)',
+        description: 'Save ₹16,250 with SBI Debit Card (On-page Carousel Offer)',
         isNoCostEmi: false,
       },
       {
@@ -58,14 +57,14 @@ export const EXACT_PRODUCT_STORE_LISTINGS: ProductListing[] = [
       },
       {
         id: 'amz-icici-cc',
-        bank: 'ICICI',
+        bank: 'Amazon Pay ICICI',
         cardType: 'credit',
         discountAmount: 4999,
         description: 'Save ₹4,999 as cashback on Amazon Pay ICICI Bank Credit Card',
         isNoCostEmi: false,
       },
       {
-        id: 'amz-upi-cb',
+        id: 'amz-upi',
         bank: 'Other',
         cardType: 'all',
         discountAmount: 50,
@@ -73,11 +72,13 @@ export const EXACT_PRODUCT_STORE_LISTINGS: ProductListing[] = [
       },
     ],
     dealBadge: 'Winner Deal',
-    badgeReason: 'Lowest Price: ₹83,740 with SBI Credit Card (Save ₹16,250 from Payment Offers).',
+    badgeReason: 'Lowest effective price with SBI Card: ₹83,740 (Save ₹16,250 directly).',
   },
+
+  // 2. Flipkart - Target Lenovo LOQ Ryzen 7
   {
-    id: 'lenovo-loq-83s0009sin-flipkart',
-    title: 'Lenovo LOQ AMD Ryzen 7 7735HS | NVIDIA GeForce RTX 3050 6GB (16 GB/512 GB SSD/144Hz/Windows 11 Home)',
+    id: 'flipkart-lenovo-loq-83s0009sin',
+    title: 'Lenovo LOQ AMD Ryzen 7 7735HS | NVIDIA GeForce RTX 3050 6GB (16 GB/512 GB SSD/144Hz/Windows 11 Home) 15ARP10E',
     brand: 'Lenovo',
     modelNumber: '83S0009SIN / 15ARP10E',
     platform: 'flipkart',
@@ -87,11 +88,11 @@ export const EXACT_PRODUCT_STORE_LISTINGS: ProductListing[] = [
     mrp: 104990,
     inStock: true,
     rating: 4.2,
-    ratingCount: 120,
+    ratingCount: 140,
     specs: {
       brand: 'Lenovo',
-      modelName: 'LOQ 15ARP10E 83S0009SIN',
-      cpu: 'AMD Ryzen 7 7735HS (8 Cores, 16 Threads, up to 4.75 GHz)',
+      modelName: 'LOQ 15ARP10E',
+      cpu: 'AMD Ryzen 7 7735HS (8 Cores, 16 Threads)',
       cpuTier: 'Ryzen 7 / i7',
       gpu: 'NVIDIA GeForce RTX 3050 6GB GDDR6',
       vramGb: 6,
@@ -105,20 +106,20 @@ export const EXACT_PRODUCT_STORE_LISTINGS: ProductListing[] = [
     },
     offers: [
       {
-        id: 'fk-hdfc-cc',
-        bank: 'HDFC',
-        cardType: 'credit',
-        discountAmount: 4500,
-        description: '₹4,500 Instant Discount on HDFC Bank Credit Card Transactions',
-        isNoCostEmi: false,
-      },
-      {
         id: 'fk-axis-cc',
         bank: 'Flipkart Axis',
         cardType: 'credit',
         discountAmount: 4499,
         discountPercentage: 5,
         description: '5% Unlimited Cashback (₹4,499) with Flipkart Axis Bank Credit Card',
+        isNoCostEmi: false,
+      },
+      {
+        id: 'fk-hdfc-cc',
+        bank: 'HDFC',
+        cardType: 'credit',
+        discountAmount: 4500,
+        description: '₹4,500 Instant Discount on HDFC Bank Credit Cards',
         isNoCostEmi: false,
       },
       {
@@ -131,11 +132,13 @@ export const EXACT_PRODUCT_STORE_LISTINGS: ProductListing[] = [
       },
     ],
     dealBadge: 'Best Direct Match',
-    badgeReason: 'Lower base price than Amazon without card (₹89,990 vs ₹99,990). Better deal if you only hold HDFC or Axis.',
+    badgeReason: 'Lower base price (₹89,990). Best if you hold Flipkart Axis or HDFC.',
   },
+
+  // 3. Croma - Lenovo LOQ 15
   {
-    id: 'lenovo-loq-croma',
-    title: 'Lenovo LOQ 15 AMD Ryzen 7 7735HS (16GB RAM/512GB SSD/NVIDIA RTX 3050 6GB/Windows 11)',
+    id: 'croma-lenovo-loq-7735hs',
+    title: 'Lenovo LOQ 15 AMD Ryzen 7 7735HS (16GB RAM/512GB SSD/NVIDIA RTX 3050 6GB/Win 11) 15.6" Gaming Laptop',
     brand: 'Lenovo',
     modelNumber: '83S0009SIN',
     platform: 'croma',
@@ -145,10 +148,10 @@ export const EXACT_PRODUCT_STORE_LISTINGS: ProductListing[] = [
     mrp: 106990,
     inStock: true,
     rating: 4.1,
-    ratingCount: 38,
+    ratingCount: 42,
     specs: {
       brand: 'Lenovo',
-      modelName: 'LOQ 15ARP10E',
+      modelName: 'LOQ 15ARP10E Croma Edition',
       cpu: 'AMD Ryzen 7 7735HS (8 Cores, 16 Threads)',
       cpuTier: 'Ryzen 7 / i7',
       gpu: 'NVIDIA GeForce RTX 3050 6GB GDDR6',
@@ -179,8 +182,105 @@ export const EXACT_PRODUCT_STORE_LISTINGS: ProductListing[] = [
         isNoCostEmi: false,
       },
     ],
-    dealBadge: undefined,
   },
+
+  // 4. Reliance Digital - Lenovo LOQ 15
+  {
+    id: 'rd-lenovo-loq-7735hs',
+    title: 'Lenovo LOQ 15 Gaming Laptop, AMD Ryzen 7 7735HS, 16GB RAM, 512GB SSD, 6GB NVIDIA RTX 3050 Graphics',
+    brand: 'Lenovo',
+    modelNumber: '83S0009SIN',
+    platform: 'reliancedigital',
+    url: 'https://www.reliancedigital.in/search?q=Lenovo%20LOQ%20Ryzen%207%3Arelevance',
+    imageUrl: 'https://images.unsplash.com/photo-1541807084-5c52b6b3adef?auto=format&fit=crop&w=600&q=80',
+    basePrice: 88990,
+    mrp: 107990,
+    inStock: true,
+    rating: 4.2,
+    ratingCount: 30,
+    specs: {
+      brand: 'Lenovo',
+      modelName: 'LOQ 15ARP10E Reliance',
+      cpu: 'AMD Ryzen 7 7735HS',
+      cpuTier: 'Ryzen 7 / i7',
+      gpu: 'NVIDIA GeForce RTX 3050 6GB',
+      vramGb: 6,
+      ramGb: 16,
+      ramType: 'DDR5',
+      storageGb: 512,
+      displaySizeInches: 15.6,
+      refreshRateHz: 144,
+      os: 'Windows 11 Home',
+    },
+    offers: [
+      {
+        id: 'rd-icici',
+        bank: 'ICICI',
+        cardType: 'credit',
+        discountAmount: 4500,
+        description: '₹4,500 Instant Discount with ICICI Bank Credit Cards on min ₹80,000',
+        isNoCostEmi: false,
+      },
+      {
+        id: 'rd-sbi',
+        bank: 'SBI',
+        cardType: 'credit',
+        discountAmount: 3500,
+        description: '₹3,500 Instant Discount on SBI Credit Cards',
+        isNoCostEmi: false,
+      },
+    ],
+  },
+
+  // 5. Vijay Sales - Lenovo LOQ 15
+  {
+    id: 'vs-lenovo-loq-7735hs',
+    title: 'Lenovo LOQ 15ARP10E Gaming Laptop (Ryzen 7 7735HS / 16GB / 512GB SSD / RTX 3050 6GB / Win 11)',
+    brand: 'Lenovo',
+    modelNumber: '83S0009SIN',
+    platform: 'vijaysales',
+    url: 'https://www.vijaysales.com/search/Lenovo%20LOQ%20RTX%203050',
+    imageUrl: 'https://images.unsplash.com/photo-1525547719571-a2d4ac8945e2?auto=format&fit=crop&w=600&q=80',
+    basePrice: 87490,
+    mrp: 105990,
+    inStock: true,
+    rating: 4.3,
+    ratingCount: 22,
+    specs: {
+      brand: 'Lenovo',
+      modelName: 'LOQ 15ARP10E Vijay Sales',
+      cpu: 'AMD Ryzen 7 7735HS',
+      cpuTier: 'Ryzen 7 / i7',
+      gpu: 'NVIDIA GeForce RTX 3050 6GB',
+      vramGb: 6,
+      ramGb: 16,
+      ramType: 'DDR5',
+      storageGb: 512,
+      displaySizeInches: 15.6,
+      refreshRateHz: 144,
+      os: 'Windows 11 Home',
+    },
+    offers: [
+      {
+        id: 'vs-hdfc',
+        bank: 'HDFC',
+        cardType: 'credit',
+        discountAmount: 4000,
+        description: '₹4,000 Instant Discount on HDFC Bank Credit Cards',
+        isNoCostEmi: false,
+      },
+      {
+        id: 'vs-icici',
+        bank: 'ICICI',
+        cardType: 'credit',
+        discountAmount: 3500,
+        description: '₹3,500 Instant Discount on ICICI Bank Cards',
+        isNoCostEmi: false,
+      },
+    ],
+  },
+
+  // 6. Lenovo Official Store India (Direct D2C)
   {
     id: 'lenovo-official-loq',
     title: 'Lenovo Official Store LOQ 15 Gen 9 AMD Ryzen 7 7735HS | RTX 3050 6GB (16GB DDR5/512GB SSD)',
@@ -196,7 +296,7 @@ export const EXACT_PRODUCT_STORE_LISTINGS: ProductListing[] = [
     ratingCount: 92,
     specs: {
       brand: 'Lenovo',
-      modelName: 'LOQ 15 Gen 9 AMD',
+      modelName: 'LOQ 15 Gen 9 AMD Official',
       cpu: 'AMD Ryzen 7 7735HS (8 Cores, 16 Threads, up to 4.75 GHz)',
       cpuTier: 'Ryzen 7 / i7',
       gpu: 'NVIDIA GeForce RTX 3050 6GB GDDR6 (95W TGP)',
@@ -228,15 +328,12 @@ export const EXACT_PRODUCT_STORE_LISTINGS: ProductListing[] = [
         isNoCostEmi: false,
       },
     ],
-    dealBadge: undefined,
   },
-];
 
-// 2. Verified Alternative Hardware Deals (Real market prices & working search/product links)
-export const ALTERNATIVE_HARDWARE_DEALS: ProductListing[] = [
+  // 7. Amazon India - Upgrade Spec: Lenovo LOQ RTX 4050 6GB
   {
-    id: 'lenovo-loq-4050-amazon',
-    title: 'Lenovo LOQ 15 AMD Ryzen 7 7435HS | NVIDIA RTX 4050 6GB 105W (16GB RAM/512GB SSD/144Hz/15.6" FHD/Win 11)',
+    id: 'amazon-lenovo-loq-4050',
+    title: 'Lenovo LOQ 15 AMD Ryzen 7 7435HS | NVIDIA RTX 4050 6GB 105W (16GB RAM/512GB SSD/144Hz/15.6" FHD/Win 11) 15ARP9',
     brand: 'Lenovo',
     modelNumber: '15ARP9',
     platform: 'amazon',
@@ -245,8 +342,8 @@ export const ALTERNATIVE_HARDWARE_DEALS: ProductListing[] = [
     basePrice: 84990,
     mrp: 112000,
     inStock: true,
-    rating: 4.3,
-    ratingCount: 142,
+    rating: 4.4,
+    ratingCount: 165,
     specs: {
       brand: 'Lenovo',
       modelName: 'LOQ 15ARP9 (RTX 4050 Edition)',
@@ -268,7 +365,7 @@ export const ALTERNATIVE_HARDWARE_DEALS: ProductListing[] = [
         bank: 'SBI',
         cardType: 'credit',
         discountAmount: 7500,
-        description: '₹7,500 Festive Instant Discount with SBI Credit Cards',
+        description: '₹7,500 Instant Discount with SBI Credit Cards',
         isNoCostEmi: false,
       },
       {
@@ -289,25 +386,27 @@ export const ALTERNATIVE_HARDWARE_DEALS: ProductListing[] = [
       },
     ],
     dealBadge: 'Spec Upgrade',
-    badgeReason: 'AI Deal Alert: For just ~₹3,750 more than the RTX 3050, you get an RTX 4050 (+35% gaming FPS & Frame Gen)!',
+    badgeReason: 'AI Deal Alert: For ~₹77,490 net, you get an RTX 4050 (+35% gaming FPS & Frame Gen).',
   },
+
+  // 8. Acer Online Store India - Acer Nitro V 15
   {
-    id: 'acer-nitro-v-amazon',
-    title: 'Acer Nitro V 15 Intel Core i5 13th Gen 13420H | NVIDIA RTX 3050 6GB (16GB/512GB SSD/144Hz/15.6" FHD/Win 11)',
+    id: 'acer-store-nitro-v',
+    title: 'Acer Official Store Nitro V 15 Intel Core i5-13420H | RTX 3050 6GB (16GB RAM/512GB SSD/144Hz IPS)',
     brand: 'Acer',
     modelNumber: 'ANV15-51',
-    platform: 'amazon',
-    url: 'https://www.amazon.in/s?k=Acer+Nitro+V+15+RTX+3050+6GB',
+    platform: 'acer',
+    url: 'https://store.acer.com/en-in/catalogsearch/result/?q=Nitro+V+15+RTX+3050+6GB',
     imageUrl: 'https://images.unsplash.com/photo-1593642632823-8f785ba67e45?auto=format&fit=crop&w=600&q=80',
-    basePrice: 73990,
-    mrp: 87999,
+    basePrice: 72990,
+    mrp: 86999,
     inStock: true,
     rating: 4.4,
-    ratingCount: 389,
+    ratingCount: 110,
     specs: {
       brand: 'Acer',
-      modelName: 'Nitro V 15 ANV15-51',
-      cpu: 'Intel Core i5-13420H (8 Cores, 12 Threads, up to 4.60 GHz)',
+      modelName: 'Nitro V 15 Official',
+      cpu: 'Intel Core i5-13420H (8 Cores, 12 Threads)',
       cpuTier: 'Ryzen 5 / i5',
       gpu: 'NVIDIA GeForce RTX 3050 6GB GDDR6 (75W TGP)',
       vramGb: 6,
@@ -321,45 +420,47 @@ export const ALTERNATIVE_HARDWARE_DEALS: ProductListing[] = [
     },
     offers: [
       {
-        id: 'nitro-sbi-cc',
-        bank: 'SBI',
-        cardType: 'credit',
-        discountAmount: 4000,
-        description: '₹4,000 Instant Discount on SBI Credit Cards',
-        isNoCostEmi: false,
-      },
-      {
-        id: 'nitro-hdfc-cc',
+        id: 'acer-hdfc',
         bank: 'HDFC',
         cardType: 'credit',
         discountAmount: 4000,
-        description: '₹4,000 Instant Discount on HDFC Credit Cards',
+        description: '₹4,000 Instant Discount with HDFC Credit Cards on Acer Store',
+        isNoCostEmi: false,
+      },
+      {
+        id: 'acer-icici',
+        bank: 'ICICI',
+        cardType: 'credit',
+        discountAmount: 3500,
+        description: '₹3,500 Instant Discount with ICICI Bank Cards',
         isNoCostEmi: false,
       },
     ],
     dealBadge: 'Budget Champion',
-    badgeReason: 'Solid build & 6GB VRAM starting at ₹69,990 net with card.',
+    badgeReason: 'Solid build & 6GB VRAM at ₹68,990 net directly from Acer.',
   },
+
+  // 9. ASUS Official eShop India - ASUS TUF A15
   {
-    id: 'asus-tuf-a15-amazon',
-    title: 'ASUS TUF Gaming A15 AMD Ryzen 7 7435HS | NVIDIA RTX 3050 4GB (16GB RAM/512GB SSD/144Hz/15.6" FHD/Win 11)',
+    id: 'asus-store-tuf-a15',
+    title: 'ASUS eShop TUF Gaming A15 AMD Ryzen 7 7435HS | RTX 3050 4GB (16GB RAM/512GB SSD/144Hz FHD)',
     brand: 'ASUS',
     modelNumber: 'FA506NC-HN083W',
-    platform: 'amazon',
-    url: 'https://www.amazon.in/s?k=ASUS+TUF+A15+Ryzen+7+RTX+3050',
+    platform: 'asus',
+    url: 'https://in.store.asus.com/search?q=TUF+Gaming+A15+RTX+3050',
     imageUrl: 'https://images.unsplash.com/photo-1541807084-5c52b6b3adef?auto=format&fit=crop&w=600&q=80',
-    basePrice: 69990,
+    basePrice: 68990,
     mrp: 87990,
     inStock: true,
     rating: 4.2,
-    ratingCount: 512,
+    ratingCount: 88,
     specs: {
       brand: 'ASUS',
-      modelName: 'TUF Gaming A15 FA506NC',
-      cpu: 'AMD Ryzen 7 7435HS (8 Cores, 16 Threads, up to 4.5 GHz)',
+      modelName: 'TUF Gaming A15 ASUS Store',
+      cpu: 'AMD Ryzen 7 7435HS (8 Cores, 16 Threads)',
       cpuTier: 'Ryzen 7 / i7',
-      gpu: 'NVIDIA GeForce RTX 3050 4GB GDDR6 (75W TGP)',
-      vramGb: 4, // 4GB caution!
+      gpu: 'NVIDIA GeForce RTX 3050 4GB GDDR6',
+      vramGb: 4,
       ramGb: 16,
       ramType: 'DDR5 4800MHz',
       storageGb: 512,
@@ -370,15 +471,15 @@ export const ALTERNATIVE_HARDWARE_DEALS: ProductListing[] = [
     },
     offers: [
       {
-        id: 'amz-asus-sbi',
+        id: 'asus-sbi',
         bank: 'SBI',
         cardType: 'credit',
         discountAmount: 3500,
-        description: '₹3,500 Instant Discount with SBI Credit Card',
+        description: '₹3,500 Instant Discount with SBI Credit Cards on ASUS eShop',
         isNoCostEmi: false,
       },
       {
-        id: 'amz-asus-icici',
+        id: 'asus-icici',
         bank: 'ICICI',
         cardType: 'credit',
         discountAmount: 3500,
@@ -387,12 +488,6 @@ export const ALTERNATIVE_HARDWARE_DEALS: ProductListing[] = [
       },
     ],
     dealBadge: undefined,
-    badgeReason: 'Caution: 4GB VRAM. 6GB models (like LOQ or Nitro) are recommended for modern games.',
+    badgeReason: 'Caution: 4GB VRAM. 6GB models (LOQ/Nitro) recommended for AAA games.',
   },
-];
-
-// Unified catalog
-export const ALL_LAPTOP_DEALS: ProductListing[] = [
-  ...EXACT_PRODUCT_STORE_LISTINGS,
-  ...ALTERNATIVE_HARDWARE_DEALS,
 ];
