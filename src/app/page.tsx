@@ -66,6 +66,7 @@ export default function Home() {
 
       const res = await fetch('/api/hunt', {
         method: 'POST',
+        cache: 'no-store',
         headers: {
           'Content-Type': 'application/json',
           'x-gemini-api-key': activeKey,

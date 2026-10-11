@@ -4,6 +4,9 @@ import { calculateEffectiveDeal, analyzeDealsWithAI } from '@/lib/ai-analyzer';
 import { DealSearchQuery } from '@/types/deal';
 import { checkRateLimit } from '@/lib/rate-limiter';
 
+export const dynamic = 'force-dynamic';
+export const revalidate = 0;
+
 export async function POST(req: Request) {
   try {
     // 1. Anti-bot IP Rate Limiter
@@ -120,14 +123,22 @@ export async function POST(req: Request) {
       apiKey
     );
 
-    return NextResponse.json({
-      exactStoreMatches: exactMatches.length > 0 ? exactMatches : calculatedDeals.slice(0, 3),
-      alternativeDeals: alternativeDeals.length > 0 ? alternativeDeals : calculatedDeals.slice(3),
-      allDeals: calculatedDeals,
-      aiAnalysis,
-      activeWallet,
-      totalStoresScanned: 13,
-    });
+    return NextResponse.json(
+      {
+        exactStoreMatches: exactMatches.length > 0 ? exactMatches : calculatedDeals.slice(0, 3),
+        alternativeDeals: alternativeDeals.length > 0 ? alternativeDeals : calculatedDeals.slice(3),
+        allDeals: calculatedDeals,
+        aiAnalysis,
+        activeWallet,
+        totalStoresScanned: 13,
+      },
+      {
+        headers: {
+          'Cache-Control': 'no-store, no-cache, must-revalidate, max-age=0',
+          Pragma: 'no-cache',
+        },
+      }
+    );
   } catch (error) {
     console.error('Error in /api/hunt:', error);
     return NextResponse.json(
