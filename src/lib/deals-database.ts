@@ -75,9 +75,9 @@ export const COMPREHENSIVE_STORE_CATALOG: ProductListing[] = [
     category: 'laptops',
     title: 'HP Official Store Victus Gaming Laptop 15 AMD Ryzen 7 7435HS | RTX 3050 6GB (16GB RAM/512GB SSD/144Hz FHD)',
     brand: 'HP',
-    modelNumber: '15-fb2000AX',
+    modelNumber: '15-fb3385AX',
     platform: 'hp',
-    url: 'https://www.hp.com/in-en/shop/laptops/gaming-laptops/victus-by-hp.html',
+    url: 'https://www.hp.com/in-en/shop/products/laptops/victus-gaming-laptop-15-fb3385ax-e20rqpa-acj',
     imageUrl: 'https://images.unsplash.com/photo-1525547719571-a2d4ac8945e2?auto=format&fit=crop&w=600&q=80',
     basePrice: 72990,
     mrp: 88499,
@@ -120,15 +120,15 @@ export const COMPREHENSIVE_STORE_CATALOG: ProductListing[] = [
     badgeReason: 'Direct HP warranty with ₹5,000 HDFC bank discount (Net: ₹67,990).',
   },
 
-  // 3. Dell India Official Store - Active Gaming Lineup
+  // 3. Dell India Official Store - Gaming PC Deals
   {
     id: 'dell-store-gaming-laptops',
     category: 'laptops',
     title: 'Dell Official Store Gaming Laptops (Alienware & High-Performance G-Series with NVIDIA RTX Graphics)',
     brand: 'Dell',
-    modelNumber: 'Dell Gaming Series',
+    modelNumber: 'Dell Gaming Lineup',
     platform: 'dell',
-    url: 'https://www.dell.com/en-in/shop/gaming-pcs/sr/gaming-laptops',
+    url: 'https://www.dellstore.com/deals/gaming-pc-deals.html',
     imageUrl: 'https://images.unsplash.com/photo-1593642632823-8f785ba67e45?auto=format&fit=crop&w=600&q=80',
     basePrice: 79990,
     mrp: 99990,
