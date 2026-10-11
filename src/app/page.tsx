@@ -54,14 +54,21 @@ export default function Home() {
       const req = reqOverride !== undefined ? reqOverride : activeRequirement;
       const cat = categoryToUse || selectedCategory;
 
+      // Check if parameters are enabled / not ignored
+      const isBrandEnabled = req?.brandPreference?.enabled !== false && req?.brandPreference?.value && req.brandPreference.value !== 'any';
+      const isRamEnabled = req?.ramGb?.enabled !== false && typeof req?.ramGb?.value === 'number' && req.ramGb.value > 0;
+      const isStorageEnabled = req?.storageGb?.enabled !== false && typeof req?.storageGb?.value === 'number' && req.storageGb.value > 0;
+      const isVramEnabled = req?.gpu?.enabled !== false && typeof req?.gpu?.value?.minVramGb === 'number' && req.gpu.value.minVramGb > 0;
+      const isBudgetEnabled = req?.budgetMax?.enabled !== false && typeof req?.budgetMax?.value === 'number' && req.budgetMax.value > 0;
+
       const body = {
         category: cat,
         selectedCards: cardsToUse,
-        brand: req?.brandPreference?.value || 'all',
-        minRamGb: cat === 'laptops' ? (req?.ramGb?.value || 16) : undefined,
-        minStorageGb: cat === 'laptops' ? (req?.storageGb?.value || 512) : undefined,
-        vramMinGb: cat === 'laptops' ? (req?.gpu?.value?.minVramGb || 6) : undefined,
-        budgetMax: req?.budgetMax?.value || 95000,
+        brand: isBrandEnabled ? req!.brandPreference.value : 'all',
+        minRamGb: cat === 'laptops' && isRamEnabled ? req!.ramGb.value : undefined,
+        minStorageGb: cat === 'laptops' && isStorageEnabled ? req!.storageGb.value : undefined,
+        vramMinGb: cat === 'laptops' && isVramEnabled ? req!.gpu.value.minVramGb : undefined,
+        budgetMax: isBudgetEnabled ? req!.budgetMax.value : undefined,
       };
 
       const res = await fetch('/api/hunt', {

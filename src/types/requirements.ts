@@ -4,6 +4,7 @@ export interface SpecRequirement<T> {
   value: T;
   priority: PriorityLevel;
   label: string;
+  enabled?: boolean;
 }
 
 export interface ParsedRequirementJSON {
